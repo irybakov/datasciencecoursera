@@ -1,0 +1,129 @@
+CodeBook: Getting and Cleaning Data Project 
+========================================================
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring web pages.
+This document describes then algorithms to get *tidy* data set from provided analytic data.
+
+Analytic data is stored in folder *./data*
+
+## Source files
+Source files to import:
+```{r}
+source('./run_analysis.R')
+```
+## Download Source data
+Source analytical data files are *NOT* included in git repository.
+If *<Your working directory>/data* does not exist, script will download and upzip source data.  
+```{r}
+  downloadData()
+```
+```r
+downloadData <- function(){
+  # if 'data' directory does not exist, create it
+  if (!file.exists("data")) {
+    dir.create("data")
+  }
+  
+  # if dataset.zip file does not exist, download it
+  if (!file.exists("./data/dataset.zip")) {
+    fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+    download.file(fileUrl, destfile = "./data/dataset.zip", method = "curl") 
+  }
+  
+  if (!file.exists("./data/UCI HAR Dataset")) {
+    unzip("./data/dataset.zip",exdir = "./data/")
+  }
+}
+```
+
+## Init 
+```{r Features}
+  # init data root path
+  path <- './data/UCI HAR Dataset'
+
+  # read feature list
+  features <- read.table(paste(path,'/features.txt',sep=""))
+  print(summary(features))
+```
+As we can see, There is 561 features total.
+
+```{r Headers}
+  
+  # get only -std or -mean headers
+  headers <- features[grep(".-std|.-mean",features$V2),]
+  print(head(headers$V2),10)
+  print(length(headers$V2)) 
+```
+Afer filtering with RegExp we will get 79 features to process.
+
+## Prepare filter before data load
+Now we have to prepare vector (cc) to filter columns when reading X data from file. Length of the vertor equals number of featurs.
+But only headers that have to be loaded marked 'numeric', other marked 'NULL'.
+```{r}
+  # vector to filter columns when reading X data 
+  cc <- c(1:length(features$V2))
+  cc[] <- 'NULL'
+  cc[headers$V1] <- 'numeric'
+```
+
+Read activity data 
+```{r}
+  # read activity labels
+  activity <- read.table(paste(path,'/activity_labels.txt',sep=""))
+  print(summary(activity))
+```
+
+## Training and Test set load and processing
+Call prepareTidyData function to process each type of data (**train**, **test**) 
+
+```{r}  
+  # preparing train tidy data
+  train <- prepareTidyData(path,'train',activity,cc)
+  # preparing test tidy data 
+  test <- prepareTidyData(path,'test',activity,cc)
+```
+
+Hear is prepareTidyData function body:
+```r
+prepareTidyData <- function(path,type,activity,cc) {
+  data_path <- paste(path,'/',type,sep="")
+  x1 <- read.table(paste(data_path,'/X_',type,'.txt',sep=""),colClasses=cc)
+  y <- read.table(paste(data_path,'/Y_',type,'.txt',sep=""))
+  s <- read.table(paste(data_path,'/subject_',type,'.txt',sep=""))
+  # add Activity ID and Subject columns to data
+  data <- cbind(y,s,x1)
+  afact <- factor(data[,1])
+  bfact <- mapvalues(afact, from = as.character(activity$V1), to = as.character(activity$V2))
+  data <- cbind(bfact,s,x1)
+  data
+}
+```
+Merging tidy results for **train** data with **test** data
+```{r}
+  # merge train data with test data
+  tidy <- rbind(train,test)
+```
+
+Now we have tidy dataset. 
+Preparing headers including *'Activty'* and *'Subject'* 
+```{r}
+  # get header names
+  header_names <- as.vector(headers$V2)
+  # add 'Activty','Subject' headers to header_names
+  tidy_headers = c('Activty','Subject',header_names)
+  colnames(tidy) <- tidy_headers
+```
+
+Save tidy data into the file. 
+```{r}
+  # save tidy data as csv file 
+  # file location is ./data/tidy_data.csv
+  write.csv(tidy,'./data/tidy_data.csv',row.names=FALSE)
+```
+
+## Summary
+Here is tidy data summary:
+```{r}
+  summary(tidy)
+```
+

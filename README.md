@@ -58,15 +58,22 @@ Notes:
 
 For more information about this dataset contact: activityrecognition@smartlab.ws
 
-Runnig Analysis:
+## Runnig Analysis:
 ================
-To run analysis in sillent mode import source file *./run_analysis.R* and call *run()* function.
+### Аnalytical data
+**Important!**
+**Source analytical data files are *NOT* included in git repository.**
+If *<Your working directory>/data* directory does not exist, script will download and upzip source data.  
+
+### Silent Mode
+To run analysis in silent mode import source file *./run_analysis.R* and call *run()* function.
 ```r
 source("./run_analysis.R")
 run()
 ```
-After successful execution **'"Tidy Data saved in ./tidy_data.csv file"'** will be pinted.
+After successful execution **'"Tidy Data saved in ./data/tidy_data.csv file"'** will be pinted.
 
+### CodeBook
 To generate CodeBook  I used  **knitr** library. Please, run in R console
 ```r
 library("knitr")
@@ -74,7 +81,7 @@ knit2html("CodeBook.Rmd")
 browseURL("CodeBook.html")
 ```
 
-License:
+## License:
 ========
 Use of this dataset in publications must be acknowledged by referencing the following publication [1] 
 

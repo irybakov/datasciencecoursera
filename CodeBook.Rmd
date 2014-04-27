@@ -127,3 +127,16 @@ Here is tidy data summary:
   summary(tidy)
 ```
 
+## Second, independent tidy data set with the average of each variable for each activity and each subject
+Second data set has 180 rows
+```{r}
+# melt tidy data
+  tMelt <- melt(tidy,id=c("Activty","Subject"))
+  # dcast using mean function
+  avgData <- dcast(tMelt, Subject + Activty  ~ variable,mean)
+  write.csv(avgData,'./data/tidy_mean_data.csv',row.names=FALSE)
+
+  nrow(avgData)
+  summary(avgData)
+```
+

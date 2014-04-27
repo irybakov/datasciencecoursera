@@ -1,4 +1,5 @@
 library("plyr")
+library(reshape2)
 setwd(".")
 
 downloadData <- function(){
@@ -66,6 +67,14 @@ run <- function(){
   # save tidy data as csv file
   write.csv(tidy,'./data/tidy_data.csv',row.names=FALSE)
   print('Tidy Data saved in ./data/tidy_data.csv file')
+  
+  # melt tidy data
+  tMelt <- melt(tidy,id=c("Activty","Subject"))
+  # dcast using mean function
+  avgData <- dcast(tMelt, Subject + Activty  ~ variable,mean)
+  write.csv(avgData,'./data/tidy_mean_data.csv',row.names=FALSE)
+  print('Tidy Mean Data saved in ./data/tidy_mean_data.csv file')
+  
 }
 
 

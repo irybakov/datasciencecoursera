@@ -1,6 +1,5 @@
 library("plyr")
-library(reshape2)
-setwd(".")
+library("reshape2")
 
 downloadData <- function(){
   # if 'data' directory does not exist, create it

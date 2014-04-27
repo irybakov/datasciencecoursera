@@ -4,7 +4,7 @@ CodeBook: Getting and Cleaning Data Project
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring web pages.
 This document describes then algorithms to get *tidy* data set from provided analytic data.
 
-Analytic data is stored in folder *./data*
+Analytic data is stored in folder *./data/UCI HAR Dataset*
 
 ## Source files
 Source files to import:
